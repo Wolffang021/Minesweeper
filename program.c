@@ -5,6 +5,7 @@
 #include <time.h>
 
 /*
+Boredr: ' '
 Unopened: '-'
 Opened: ' ', '1-8'
 Mark: 'x'
@@ -21,16 +22,26 @@ void initializeGrid(int x, int y, int grid[][x], char display[][x]) {
 }
         
 void displayGrid(int x, int y, char display[][x]) {
+    char border = ' ';
+
     printf("\n");
-    for (int i = y - 1; i >= -1; i--) {
+    for (int i = y - 1; i >= -2; i--) {
         if (i == -1) {
-            printf("  ");
+            printf("%c %c ", border, border);
+            for (int j = 0; j < x; j++)
+                printf("%c ", border);
+            printf("\n");
+            continue;
+        }
+
+        if (i == -2) {
+            printf("  %c ", border);
             for (int j = 0; j < x; j++)
                 printf("%d ", j);
             continue;
         }
 
-        printf("%d ", i);
+        printf("%d %c ", i, border);
         for (int j = 0; j < x; j++)
             printf("%c ", display[i][j]);
         
