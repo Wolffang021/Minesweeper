@@ -63,12 +63,12 @@ void markCell(int x, int y, int grid[][x], char display[][x]) {
                 continue;
             }
             
-            if (display[coX][coY] == '-') {
-                display[coX][coY] = 'x';
+            if (display[coY][coX] == '-') {
+                display[coY][coX] = 'x';
                 printf("\nMarked %d, %d\n", coX, coY);
             }
             else {
-                display[coX][coY] = '-';
+                display[coY][coX] = '-';
                 printf("\nUnmarked %d, %d\n", coX, coY);
             }
 
@@ -89,13 +89,13 @@ void markCell(int x, int y, int grid[][x], char display[][x]) {
 }
 
 bool openCell(int x, int y, int grid[][x], char display[][x], int coX, int coY) {
-    if (grid[coX][coY] == 1)
-        return true;
+    if (grid[coY][coX] == 1)
+        return false;
     
     int mines = 0;
-    for (int i = coX - 1; i <= coX + 1; i++) {
-        for (int j = coY - 1; j <= coY + 1; j++) {
-            if (i < 0 || i >= x || j < 0 || j >= y)
+    for (int i = coY - 1; i <= coY + 1; i++) {
+        for (int j = coX - 1; j <= coX + 1; j++) {
+            if (i < 0 || i >= y || j < 0 || j >= x)
                 continue;
             
             if (grid[i][j] == 1)
@@ -103,13 +103,21 @@ bool openCell(int x, int y, int grid[][x], char display[][x], int coX, int coY) 
         }
     }
 
-    if (mines > 0) {
-        display[coX][coY] = mines + '0';
-    }
+    if (mines > 0)
+        display[coY][coX] = mines + '0';
     else {
-        display[coX][coY] = ' ';
+        display[coY][coX] = ' ';
+        for (int i = coY - 1; i <= coY + 1; i++) {
+            for (int j = coX - 1; j <= coX + 1; j++) {
+                if (i < 0 || i >= y || j < 0 || j >= x)
+                    continue;
+                
+                if (display[i][j] != ' ')
+                    openCell(x, y, grid, display, j, i);
+            }
+        }
     }
-    return false;
+    return true;
 }
 
 void play() {
@@ -145,10 +153,11 @@ void play() {
                 continue;
             }
             
-            bool gameOver;
-            if (display[coX][coY] == '-') {
-                gameOver = openCell(lengthX, lengthY, grid, display, coX, coY);
-                // printf("\nMarked %d, %d\n", coX, coY);
+            if (display[coY][coX] == '-') {
+                if(!openCell(lengthX, lengthY, grid, display, coX, coY)) {
+                    printf("\nGame Over!!\n");
+                    exit = true;
+                }
             }
             else
                 printf("\nAlready opened!\n");
