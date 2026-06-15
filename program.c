@@ -1,14 +1,14 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 
 /*
-Unopened: -
-Opened: 0-8
-Mark: x
-Mine: +
+Unopened: '-'
+Opened: ' ', '1-8'
+Mark: 'x'
+Mine: '+'
 */
 
 void initializeGrid(int x, int y, int grid[][x], char display[][x]) {
@@ -57,16 +57,22 @@ void markCell(int x, int y, int grid[][x], char display[][x]) {
                 printf("\n!!INVALID INPUT!!\n");
                 continue;
             }
-
-            if (display[coX][coY] != 'x') {
+            
+            if (coX < 0 || coX >= x || coY < 0 || coY >= y) {
+                printf("\n!!INVALID COORDINATES!!\n");
+                continue;
+            }
+            
+            if (display[coX][coY] == '-') {
                 display[coX][coY] = 'x';
                 printf("\nMarked %d, %d\n", coX, coY);
-                return;
             }
             else {
-                printf("\nAlready marked!\n");
-                return;
+                display[coX][coY] = '-';
+                printf("\nUnmarked %d, %d\n", coX, coY);
             }
+
+            return;
         }
 
         switch (choice[0]) {
@@ -82,6 +88,30 @@ void markCell(int x, int y, int grid[][x], char display[][x]) {
     } while (!exit);
 }
 
+bool openCell(int x, int y, int grid[][x], char display[][x], int coX, int coY) {
+    if (grid[coX][coY] == 1)
+        return true;
+    
+    int mines = 0;
+    for (int i = coX - 1; i <= coX + 1; i++) {
+        for (int j = coY - 1; j <= coY + 1; j++) {
+            if (i < 0 || i >= x || j < 0 || j >= y)
+                continue;
+            
+            if (grid[i][j] == 1)
+                mines++;
+        }
+    }
+
+    if (mines > 0) {
+        display[coX][coY] = mines + '0';
+    }
+    else {
+        display[coX][coY] = ' ';
+    }
+    return false;
+}
+
 void play() {
     srand(time(0));
     int lengthX = 8, lengthY = 6;
@@ -94,7 +124,7 @@ void play() {
     do {
         char choice[1024];
         displayGrid(lengthX, lengthY, display);
-        printf("\nOpen unopened cell: [x-coord]<space>[y-coord]");
+        printf("\nOpen cell: [x-coord]<space>[y-coord]");
         printf("\nMark cell: [m]");
         printf("\nExit: [x]");
         printf("\nInput: ");
@@ -102,6 +132,27 @@ void play() {
         choice[strcspn(choice, "\n")] = '\0';
 
         if (strlen(choice) > 1) {
+            int coX, coY;
+            int matched = sscanf(choice, "%d %d", &coX, &coY);
+
+            if (matched != 2) {
+                printf("\n!!INVALID INPUT!!\n");
+                continue;
+            }
+
+            if (coX < 0 || coX >= lengthX || coY < 0 || coY >= lengthY) {
+                printf("\n!!INVALID COORDINATES!!\n");
+                continue;
+            }
+            
+            bool gameOver;
+            if (display[coX][coY] == '-') {
+                gameOver = openCell(lengthX, lengthY, grid, display, coX, coY);
+                // printf("\nMarked %d, %d\n", coX, coY);
+            }
+            else
+                printf("\nAlready opened!\n");
+
             continue;
         }
 
@@ -127,15 +178,16 @@ void main() {
     bool exit = false;
     
     do {
-        char choice;
-        printf("\nMINESWEEPER v1");
+        char choice[1024];
+        printf("\nMINESWEEPER vAlpha-1");
         printf("\n\tby Shourjo");
         printf("\nPLAY [Press '1']");
         printf("\nEXIT [Press '0']");
         printf("\nInput: ");
-        scanf(" %c", &choice);
+        fgets(choice, sizeof(choice), stdin);
+        choice[strcspn(choice, "\n")] = '\0';
 
-        switch (choice) {
+        switch (choice[0]) {
             default:
                 printf("\n!!INVALID INPUT!!\n");
                 break;
