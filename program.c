@@ -39,6 +39,49 @@ void displayGrid(int x, int y, char display[][x]) {
     printf("\n");
 }
 
+void markCell(int x, int y, int grid[][x], char display[][x]) {
+    bool exit = false;
+    do {
+        char choice[1024];
+        printf("\nCell coords: [x-coord]<space>[y-coord]");
+        printf("\nBack: [b]");
+        printf("\nInput: ");
+        fgets(choice, sizeof(choice), stdin);
+        choice[strcspn(choice, "\n")] = '\0';
+
+        if (strlen(choice) > 1) {
+            int coX, coY;
+            int matched = sscanf(choice, "%d %d", &coX, &coY);
+
+            if (matched != 2) {
+                printf("\n!!INVALID INPUT!!\n");
+                continue;
+            }
+
+            if (display[coX][coY] != 'x') {
+                display[coX][coY] = 'x';
+                printf("\nMarked %d, %d\n", coX, coY);
+                return;
+            }
+            else {
+                printf("\nAlready marked!\n");
+                return;
+            }
+        }
+
+        switch (choice[0]) {
+            default:
+                printf("\n!!INVALID INPUT!!\n");
+                break;
+            
+            case 'B':
+            case 'b':
+                exit = true;
+                break;
+        }
+    } while (!exit);
+}
+
 void play() {
     srand(time(0));
     int lengthX = 8, lengthY = 6;
@@ -55,14 +98,27 @@ void play() {
         printf("\nMark cell: [m]");
         printf("\nExit: [x]");
         printf("\nInput: ");
-        gets(choice);
+        fgets(choice, sizeof(choice), stdin);
+        choice[strcspn(choice, "\n")] = '\0';
 
-        switch (choice) {
+        if (strlen(choice) > 1) {
+            continue;
+        }
+
+        switch (choice[0]) {
             default:
                 printf("\n!!INVALID INPUT!!\n");
                 break;
             
-            case 
+            case 'M':
+            case 'm':
+                markCell(lengthX, lengthY, grid, display);
+                break;
+            
+            case 'X':
+            case 'x':
+                exit = true;
+                break;
         }
     } while (!exit);
 }
@@ -72,11 +128,11 @@ void main() {
     
     do {
         char choice;
-        printf("\nMINESWEEPER");
+        printf("\nMINESWEEPER v1");
         printf("\n\tby Shourjo");
         printf("\nPLAY [Press '1']");
         printf("\nEXIT [Press '0']");
-        printf("\n\nInput: ");
+        printf("\nInput: ");
         scanf(" %c", &choice);
 
         switch (choice) {
