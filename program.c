@@ -5,7 +5,7 @@
 #include <time.h>
 
 /*
-Boredr: ' '
+Border: ' '
 Unopened: '-'
 Opened: ' ', '1-8'
 Mark: 'x'
@@ -225,7 +225,7 @@ void play() {
     } while (!exit);
 }
 
-void main() {
+int main() {
     bool exit = false;
     
     do {
@@ -254,4 +254,5 @@ void main() {
     } while (!exit);
 
     printf("\nHope you had fun! <3\n");
+    return 0;
 }
